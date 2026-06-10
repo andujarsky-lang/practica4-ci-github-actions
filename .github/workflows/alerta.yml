@@ -1,0 +1,30 @@
+name: Alerta Push Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Ejecutar Prueba Unitaria
+        run: node test.js
+
+      - name: Enviar notificación a ntfy
+        if: success()
+        run: |
+          curl -H "Title: Nuevo Push en Main - ¡Test Exitoso!" \
+               -H "Priority: default" \
+               -d "Se realizó un push al repositorio ${{ github.repository }} por ${{ github.actor }} y la prueba unitaria pasó correctamente." \
+               https://ntfy.sh/devops-itla
